@@ -163,6 +163,7 @@ def grade():
 	session.flash = "Graded %d Assignments" % (count_graded)
 	return redirect(URL('assignments','admin'))
 
+@auth.requires(lambda: verifyInstructorStatus(auth.user.course_name, auth.user), requires_login=True)
 def detail():
 	course = db(db.courses.id == auth.user.course_id).select().first()
 	assignment = db(db.assignments.id == request.vars.id)(db.assignments.course == course.id).select().first()
@@ -172,12 +173,14 @@ def detail():
 	grades = db(db.assignments.id == db.grades.assignment)(db.grades.auth_user == db.auth_user.id)
 	grades = grades(db.assignments.id == assignment.id)
 	grades = grades.select()
-	problems = []
+	
 	student = None
 	if 'sid' in request.vars:
 		student_id = request.vars.sid
 		student = db(db.auth_user.id == student_id).select().first()
 		problems = assignment.problems(student)
+	else:
+		problems = assignment.problems()
 
 	return dict(
 		assignment = assignment,
