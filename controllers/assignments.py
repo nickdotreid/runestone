@@ -170,9 +170,21 @@ def detail():
 	if not assignment:
 		return redirect(URL("assignments","index"))
 
-	grades = db(db.assignments.id == db.grades.assignment)(db.grades.auth_user == db.auth_user.id)
-	grades = grades(db.assignments.id == assignment.id)
-	grades = grades.select()
+	acid = None
+	if 'acid' in request.vars:
+		acid = request.vars['acid']
+		grades = db(db.code.sid == db.auth_user.username)
+		grades = grades(db.code.acid == acid)
+		grades = grades.select(
+			db.auth_user.ALL,
+			db.code.ALL,
+			orderby = db.auth_user.id|db.auth_user.last_name,
+			distinct = db.auth_user.id,
+			)
+	else:
+		grades = db(db.assignments.id == db.grades.assignment)(db.grades.auth_user == db.auth_user.id)
+		grades = grades(db.assignments.id == assignment.id)
+		grades = grades.select()
 	
 	student = None
 	if 'sid' in request.vars:
@@ -187,4 +199,5 @@ def detail():
 		problems = problems,
 		grades = grades,
 		student = student,
+		acid = acid,
 		)

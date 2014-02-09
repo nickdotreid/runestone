@@ -13,10 +13,17 @@
 			<h3>Students</h3>
 			<ul class="list-group">
 			{{for row in grades:}}
+			{{if acid:}}
+			<li class="list-group-item">
+				<span class="badge">{{=row.code.grade}}</span>
+				<a href="#">{{=row.auth_user.first_name}} {{=row.auth_user.last_name}}</a>
+			</li>
+			{{else:}}
 			<li class="list-group-item">
 				<span class="badge">{{=row.grades.score}}</span>
 				<a href="{{=URL('assignments','detail')}}?id={{=assignment.id}}&sid={{=row.auth_user.id}}">{{=row.auth_user.first_name}} {{=row.auth_user.last_name}}</a>
 			</li>
+			{{pass}}
 			{{pass}}
 		</ul>
 		</div>
@@ -29,9 +36,12 @@
 			<ul class="list-group">
 			{{for row in problems:}}
 				<li class="list-group-item">
+					{{if student:}}
 					<span class="badge">{{=row.grade}}</span>
 					<a href="#">{{=row.acid}}</a>
-
+					{{else:}}
+					<a href="{{=URL('assignments','detail')}}?id={{=assignment.id}}&acid={{=row.acid}}">{{=row.acid}}</a>
+					{{pass}}
 				</li>
 			{{pass}}
 			</ul>
